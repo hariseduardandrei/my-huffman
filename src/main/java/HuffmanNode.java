@@ -1,5 +1,3 @@
-package altceva;
-
 public class HuffmanNode implements Comparable<HuffmanNode> {
     int frequency;
     char data;
