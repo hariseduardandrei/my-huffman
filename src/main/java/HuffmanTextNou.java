@@ -1,4 +1,6 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -7,25 +9,19 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Huffman {
+public class HuffmanTextNou {
 
-    private static Map<Character, String> charPrefixHashMap = new HashMap<>();
-    static HuffmanNode root;
-
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         String text = getTextFromFile();
-//        System.out.println("Original Text = " + text);
-        Thread.sleep(2000);
         String s = encode(text);
-        Thread.sleep(2000);
-//        decode(s);
+        decode(s);
 
     }
 
     private static String getTextFromFile() {
         StringBuilder contentBuilder = new StringBuilder();
-        try (Stream<String> stream = Files.lines(Paths.get("input-text.txt"), StandardCharsets.UTF_8)) {
+        try (Stream<String> stream = Files.lines(Paths.get("text-pentru-dictionar.txt"), StandardCharsets.UTF_8)) {
             stream.forEach(s -> contentBuilder.append(s).append("\n"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,47 +38,23 @@ public class Huffman {
             frequency.put(text.charAt(i), frequency.get(text.charAt(i)) + 1);
         }
 
-        Map<Character, Integer> sortedFrequency =
-                frequency.entrySet().stream()
-                        .sorted(Entry.comparingByValue())
-                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue,
-                                (e1, e2) -> e1, LinkedHashMap::new));
-
-
-        String prettyFreq = getPrettyFreq(frequency);
-        System.out.println("Dictionarul de frecventa = " + prettyFreq);
-        System.out.println();
-        System.out.println("Sortat: " + sortedFrequency + "\n");
-
         root = buildTree(frequency);
         setPrefixCodes(root, new StringBuilder());
 
-        String prettyPrefix = getPrettyPrefix();
-        System.out.println("Dictionarul de prefixuri = " + prettyPrefix);
-
+        StringBuilder contentBuilder = new StringBuilder();
+        try (Stream<String> stream = Files.lines(Paths.get("text-pentru-codare.txt"), StandardCharsets.UTF_8)) {
+            stream.forEach(s -> contentBuilder.append(s).append("\n"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String textPentruCodare = contentBuilder.toString();
 
         StringBuilder s = new StringBuilder();
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
+        for (int i = 0; i < textPentruCodare.length(); i++) {
+            char c = textPentruCodare.charAt(i);
             s.append(charPrefixHashMap.get(c));
         }
         return s.toString();
-    }
-
-    private static String getPrettyFreq(final Map<Character, Integer> frequency) {
-        StringBuilder sb = new StringBuilder();
-        Iterator<Entry<Character, Integer>> iter = frequency.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<Character, Integer> entry = iter.next();
-            sb.append("caracterul \"");
-            sb.append(entry.getKey());
-            sb.append("\" cu frecventa ");
-            sb.append(entry.getValue());
-            if (iter.hasNext()) {
-                sb.append(',').append(' ');
-            }
-        }
-        return sb.toString();
     }
 
     private static HuffmanNode buildTree(Map<Character, Integer> freq) {
@@ -144,22 +116,6 @@ public class Huffman {
 
     }
 
-    private static String getPrettyPrefix() {
-        StringBuilder sb = new StringBuilder();
-        Iterator<Entry<Character, String>> iter = charPrefixHashMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<Character, String> entry = iter.next();
-            sb.append("caracterul \"");
-            sb.append(entry.getKey());
-            sb.append("\" cu codul ");
-            sb.append(entry.getValue());
-            if (iter.hasNext()) {
-                sb.append(',').append(' ');
-            }
-        }
-        return sb.toString();
-    }
-
 
     private static void decode(String s) {
 
@@ -167,7 +123,7 @@ public class Huffman {
 
         HuffmanNode temp = root;
 
-        System.out.println("Encoded: " + s);
+        System.out.println("Codat: " + s);
 
         for (int i = 0; i < s.length(); i++) {
             int j = Integer.parseInt(String.valueOf(s.charAt(i)));
@@ -188,7 +144,10 @@ public class Huffman {
             }
         }
 
-        System.out.println("Textul decodat este :" + stringBuilder.toString());
+        System.out.println("Textul decodat este: " + stringBuilder.toString());
 
     }
+
+    private static Map<Character, String> charPrefixHashMap = new HashMap<>();
+    static HuffmanNode root;
 }

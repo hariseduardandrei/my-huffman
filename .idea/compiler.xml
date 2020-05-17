@@ -11,8 +11,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="huffman" target="1.5" />
-      <module name="my-huffman" target="1.5" />
+      <module name="huffman" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
